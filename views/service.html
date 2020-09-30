@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>service-worker</title>
+  <script src="https://zuhaowan.zuhaowan.com/v1/js/jquery-1.9.1.js"></script>
+</head>
+<body>
+  <div> service-worker 测试</div>
+  <p>当前service worker状态：<span id="swState"></span></p>
+  <button id="btns">发送消息</button>
+  <button id="req">发送请求</button>
+  <script>
+if ('serviceWorker' in navigator) {
+    // 开始注册service workers
+    navigator.serviceWorker.register('sw.js?v=4').then( (registration)=> {
+       console.log('注册成功');
+        var serviceWorker;
+        if (registration.installing) {
+            serviceWorker = registration.installing;
+           console.log('installing');
+        } else if (registration.waiting) {
+            serviceWorker = registration.waiting;
+           console.log('waiting');
+        } else if (registration.active) {
+            serviceWorker = registration.active;
+           console.log('active');
+        }
+        if (serviceWorker) {
+          $('#swState').text(serviceWorker.state);
+            serviceWorker.addEventListener('statechange', function (e) {
+              $('#swState').append('&emsp;状态变化为' + e.target.state);
+            });
+        }
+    }).catch ((error) =>{
+       console.log('注册失败');
+    });
+}
+const btns=document.querySelector("#btns");
+const req=document.querySelector("#req");
+btns.addEventListener('click',()=>{
+  console.log("send message to service!!")
+  navigator.serviceWorker.controller.postMessage("Hi!");
+});
+req.addEventListener('click',()=>{
+  var src = 'http://zuhaowan.zuhaowan.com/client2/img/double11.png';
+      var img = new Image();
+      img.src = src;
+ $.ajax({
+   method:"get",
+   url:"/json",
+   success:function(res){
+     console.log(res)
+   }
+ })
+});
+navigator.serviceWorker.addEventListener("message", function(event) {
+      console.log("***main process get message***")
+      console.log(event.data)
+    });
+</script>
+</body>
+</html>
